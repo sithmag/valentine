@@ -6,7 +6,9 @@ export default function Page() {
   const [yesPressed, setYesPressed] = useState(false);
   const [bgBump, setBgBump] = useState(false);
 
-  const yesButtonSize = noCount * 20 + 16;
+  // YES grows and pushes NO away (layout growth)
+  // Clamp so it doesn't explode and ruin the layout
+  const yesButtonSize = Math.min(noCount * 16 + 16, 110);
 
   const handleNoClick = () => {
     setNoCount((c) => c + 1);
@@ -74,8 +76,11 @@ export default function Page() {
               fontSize: `${h.size}px`,
               animationDuration: `${h.duration}s`,
               animationDelay: `${h.delay}s`,
-              opacity: h.opacity,
-              ["--drift"]: `${h.drift}px`,
+              opacity: Number(h.opacity),
+            }}
+            // TS-safe custom css variable
+            ref={(el) => {
+              if (el) el.style.setProperty("--drift", `${h.drift}px`);
             }}
           >
             ♥
@@ -101,10 +106,10 @@ export default function Page() {
               May I be your valentine pleaseeeeeeee babaaaa?
             </h1>
 
-            {/* BUTTONS — tighter spacing + matching padding */}
+            {/* YES grows and pushes NO away */}
             <div className="flex items-center gap-3 opacity-0 animate-slideUp">
               <button
-                className="rounded bg-green-500 px-6 py-3 font-bold text-white hover:bg-green-700 transition-transform active:scale-95"
+                className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-700"
                 style={{ fontSize: yesButtonSize }}
                 onClick={() => setYesPressed(true)}
               >
@@ -113,7 +118,7 @@ export default function Page() {
 
               <button
                 onClick={handleNoClick}
-                className="rounded bg-red-500 px-6 py-3 font-bold text-white hover:bg-red-700 transition-transform active:scale-95"
+                className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
               >
                 {noCount === 0 ? "No" : getNoButtonText()}
               </button>
